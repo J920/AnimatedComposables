@@ -174,7 +174,7 @@ fun AnimatedRow(
     content: @Composable RowScope.() -> Unit
 ) {
     AnimateAlwaysEnter(
-        isSavable = true,
+        isSavable = false,
         enter = enterTransition(order, orderingDelayInMillis),
         exit = exitTransition(order, orderingDelayInMillis)
     ) {
