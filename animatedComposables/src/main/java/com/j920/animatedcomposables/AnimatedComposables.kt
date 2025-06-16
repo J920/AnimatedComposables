@@ -38,6 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 
+enum class AnimationDirection{
+    Vertical,
+    Horizontal
+}
+
 @Composable
 fun AnimatedScaffold(
     modifier: Modifier = Modifier,
@@ -51,17 +56,41 @@ fun AnimatedScaffold(
     contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
     order: Int = 1,
     orderingDelayInMillis: Int = 0,
+    durationMillis: Int = 500,
+     animationDirection: AnimationDirection = AnimationDirection.Vertical,
     enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(animationSpec = tween(delayMillis = delay * order)) + slideInVertically(
+        fadeIn(
             animationSpec = tween(
-                delayMillis = delay * order
+                durationMillis = durationMillis,
+                delayMillis = delay * order,
             )
-        )
+              ) + if(animationDirection == AnimationDirection.Vertical) {
+            slideInVertically (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetY = {-it/2}
+            )
+        }else{
+           slideInHorizontally (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetX = {it/2}
+            ) 
+        }
     },
     exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + slideOutVertically(
+        fadeOut(animationSpec = tween(delayMillis = delay * order)) +  if(animationDirection == AnimationDirection.Vertical) {
+            slideOutVertically(
             animationSpec = tween(delayMillis = delay * order)
         )
+        }else{
+             slideOutHorizontally(
+            animationSpec = tween(delayMillis = delay * order)
+        }
     },
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -94,17 +123,41 @@ private fun AnimatedFab(
     floatingActionButton: @Composable () -> Unit = {},
     order: Int = 1,
     orderingDelayInMillis: Int = 0,
+       durationMillis: Int = 500,
+     animationDirection: AnimationDirection = AnimationDirection.Vertical,
     enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(animationSpec = tween(delayMillis = delay * order)) + slideInVertically(
+        fadeIn(
             animationSpec = tween(
-                delayMillis = delay * order
+                durationMillis = durationMillis,
+                delayMillis = delay * order,
             )
-        )
+              ) + if(animationDirection == AnimationDirection.Vertical) {
+            slideInVertically (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetY = {-it/2}
+            )
+        }else{
+           slideInHorizontally (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetX = {it/2}
+            ) 
+        }
     },
     exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + slideOutVertically(
+        fadeOut(animationSpec = tween(delayMillis = delay * order)) +  if(animationDirection == AnimationDirection.Vertical) {
+            slideOutVertically(
             animationSpec = tween(delayMillis = delay * order)
         )
+        }else{
+             slideOutHorizontally(
+            animationSpec = tween(delayMillis = delay * order)
+        }
     },
 ) {
     AnimateAlwaysEnter(
@@ -124,17 +177,41 @@ fun AnimatedColumn(
     orderingDelayInMillis: Int = 0,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+       durationMillis: Int = 500,
+     animationDirection: AnimationDirection = AnimationDirection.Vertical,
     enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(animationSpec = tween(delayMillis = delay * order)) + slideInVertically(
+        fadeIn(
             animationSpec = tween(
-                delayMillis = delay * order
+                durationMillis = durationMillis,
+                delayMillis = delay * order,
             )
-        )
+              ) + if(animationDirection == AnimationDirection.Vertical) {
+            slideInVertically (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetY = {-it/2}
+            )
+        }else{
+           slideInHorizontally (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetX = {it/2}
+            ) 
+        }
     },
     exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + slideOutVertically(
+        fadeOut(animationSpec = tween(delayMillis = delay * order)) +  if(animationDirection == AnimationDirection.Vertical) {
+            slideOutVertically(
             animationSpec = tween(delayMillis = delay * order)
         )
+        }else{
+             slideOutHorizontally(
+            animationSpec = tween(delayMillis = delay * order)
+        }
     },
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -156,17 +233,41 @@ fun AnimatedColumn(
 fun AnimatedRow(
     order: Int = 1,
     orderingDelayInMillis: Int = 0,
+       durationMillis: Int = 500,
+     animationDirection: AnimationDirection = AnimationDirection.Vertical,
     enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(animationSpec = tween(delayMillis = delay * order)) + slideInVertically(
+        fadeIn(
             animationSpec = tween(
-                delayMillis = delay * order
+                durationMillis = durationMillis,
+                delayMillis = delay * order,
             )
-        )
+              ) + if(animationDirection == AnimationDirection.Vertical) {
+            slideInVertically (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetY = {-it/2}
+            )
+        }else{
+           slideInHorizontally (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetX = {it/2}
+            ) 
+        }
     },
     exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + slideOutVertically(
+        fadeOut(animationSpec = tween(delayMillis = delay * order)) +  if(animationDirection == AnimationDirection.Vertical) {
+            slideOutVertically(
             animationSpec = tween(delayMillis = delay * order)
         )
+        }else{
+             slideOutHorizontally(
+            animationSpec = tween(delayMillis = delay * order)
+        }
     },
     modifier: Modifier = Modifier,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
@@ -192,17 +293,41 @@ fun AnimatedBox(
     modifier: Modifier = Modifier,
     order: Int = 1,
     orderingDelayInMillis: Int = 0,
+       durationMillis: Int = 500,
+     animationDirection: AnimationDirection = AnimationDirection.Vertical,
     enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(animationSpec = tween(delayMillis = delay * order)) + slideInVertically(
+        fadeIn(
             animationSpec = tween(
-                delayMillis = delay * order
+                durationMillis = durationMillis,
+                delayMillis = delay * order,
             )
-        )
+              ) + if(animationDirection == AnimationDirection.Vertical) {
+            slideInVertically (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetY = {-it/2}
+            )
+        }else{
+           slideInHorizontally (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetX = {it/2}
+            ) 
+        }
     },
     exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + slideOutVertically(
+        fadeOut(animationSpec = tween(delayMillis = delay * order)) +  if(animationDirection == AnimationDirection.Vertical) {
+            slideOutVertically(
             animationSpec = tween(delayMillis = delay * order)
         )
+        }else{
+             slideOutHorizontally(
+            animationSpec = tween(delayMillis = delay * order)
+        }
     },
     contentAlignment: Alignment = Alignment.TopStart,
     propagateMinConstraints: Boolean = false,
@@ -229,17 +354,41 @@ fun LazyListScope.AnimatedItem(
     contentType: Any? = null,
     order: Int = 1,
     orderingDelayInMillis: Int = 0,
+        durationMillis: Int = 500,
+     animationDirection: AnimationDirection = AnimationDirection.Vertical,
     enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(animationSpec = tween(delayMillis = delay * order)) + slideInVertically(
+        fadeIn(
             animationSpec = tween(
-                delayMillis = delay * order
+                durationMillis = durationMillis,
+                delayMillis = delay * order,
             )
-        )
+              ) + if(animationDirection == AnimationDirection.Vertical) {
+            slideInVertically (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetY = {-it/2}
+            )
+        }else{
+           slideInHorizontally (
+                animationSpec = tween(
+                    durationMillis = durationMillis/2,
+                    delayMillis = delay
+                ),
+                initialOffsetX = {it/2}
+            ) 
+        }
     },
     exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + slideOutVertically(
+        fadeOut(animationSpec = tween(delayMillis = delay * order)) +  if(animationDirection == AnimationDirection.Vertical) {
+            slideOutVertically(
             animationSpec = tween(delayMillis = delay * order)
         )
+        }else{
+             slideOutHorizontally(
+            animationSpec = tween(delayMillis = delay * order)
+        }
     },
     content: @Composable LazyItemScope.() -> Unit
 ) {
@@ -252,41 +401,6 @@ fun LazyListScope.AnimatedItem(
             key = key,
             contentType = contentType,
             content = content
-        )
-    }
-}
-
-@Composable
-fun LazyListScope.AnimatedItems(
-    count: Int,
-    key: ((index: Int) -> Any)? = null,
-    contentType: (index: Int) -> Any? = { null },
-    order: Int = 1,
-    orderingDelayInMillis: Int = 0,
-    enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(animationSpec = tween(delayMillis = delay * order)) + slideInVertically(
-            animationSpec = tween(
-                delayMillis = delay * order
-            )
-        )
-    },
-    exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + slideOutVertically(
-            animationSpec = tween(delayMillis = delay * order)
-        )
-    },
-    itemContent: @Composable LazyItemScope.(index: Int) -> Unit
-) {
-    AnimateAlwaysEnter(
-        isSavable = true,
-        enter = enterTransition(order, orderingDelayInMillis),
-        exit = exitTransition(order, orderingDelayInMillis)
-    ) {
-        items(
-            count = count,
-            key = key,
-            contentType = contentType,
-            itemContent = itemContent
         )
     }
 }
