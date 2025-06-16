@@ -101,10 +101,6 @@ fun slideEnterHorizontalAnimation(
     )
 }
 
-fun slideExitHorizontalAnimation(): ExitTransition {
-    return slideOutHorizontally() + shrinkHorizontally() + fadeOut()
-}
-
 fun slideEnterVerticalAnimation(
     density: Density,
     expandFrom: Alignment.Vertical = Alignment.Top,
@@ -122,3 +118,138 @@ fun slideEnterVerticalAnimation(
         initialAlpha = 0.3f,
     )
 }
+
+fun slideExitHorizontalAnimation(): ExitTransition {
+    return slideOutHorizontally() + shrinkHorizontally() + fadeOut()
+}
+
+
+fun fadeWithSlideDown(
+    durationMillis: Int = 500,
+    delay: Int = 0
+): EnterTransition = fadeIn(
+    animationSpec = tween(
+        durationMillis = durationMillis,
+        delayMillis = delay,
+    )
+) + slideInVertically(
+    animationSpec = tween(
+        durationMillis = durationMillis / 2,
+        delayMillis = delay
+    ),
+    initialOffsetY = { -it / 2 }
+)
+
+
+fun fadeWithSlideUp(
+    durationMillis: Int = 500,
+    delay: Int = 0
+): EnterTransition = fadeIn(
+    animationSpec = tween(
+        durationMillis = durationMillis,
+        delayMillis = delay,
+    )
+) + slideInVertically(
+    animationSpec = tween(
+        durationMillis = durationMillis / 2,
+        delayMillis = delay
+    ),
+    initialOffsetY = { it / 2 }
+)
+
+fun fadeWithSlideRight(
+    durationMillis: Int = 500,
+    delay: Int = 0
+): EnterTransition = fadeIn(
+    animationSpec = tween(
+        durationMillis = durationMillis,
+        delayMillis = delay,
+    )
+) +  slideInHorizontally(
+    animationSpec = tween(
+        durationMillis = durationMillis / 2,
+        delayMillis = delay
+    ),
+    initialOffsetX = { -it / 2 }
+)
+
+fun fadeWithSlideLeft(
+    durationMillis: Int = 500,
+    delay: Int = 0
+): EnterTransition = fadeIn(
+    animationSpec = tween(
+        durationMillis = durationMillis,
+        delayMillis = delay,
+    )
+) +   slideInHorizontally(
+    animationSpec = tween(
+        durationMillis = durationMillis / 2,
+        delayMillis = delay
+    ),
+    initialOffsetX = { it / 2 }
+)
+
+fun fadeOutWithSlideDown(
+    durationMillis: Int = 500,
+    delay: Int = 0
+): ExitTransition = fadeOut(
+    animationSpec = tween(
+        durationMillis = durationMillis,
+        delayMillis = delay,
+    )
+) + slideOutVertically(
+    animationSpec = tween(
+        durationMillis = durationMillis / 2,
+        delayMillis = delay
+    ),
+    targetOffsetY = { -it / 2 }
+)
+
+
+fun fadeOutWithSlideUp(
+    durationMillis: Int = 500,
+    delay: Int = 0
+): ExitTransition = fadeOut(
+    animationSpec = tween(
+        durationMillis = durationMillis,
+        delayMillis = delay,
+    )
+) + slideOutVertically(
+    animationSpec = tween(
+        durationMillis = durationMillis / 2,
+        delayMillis = delay
+    ),
+    targetOffsetY = { it / 2 }
+)
+
+fun fadeOutWithSlideRight(
+    durationMillis: Int = 500,
+    delay: Int = 0
+): ExitTransition = fadeOut(
+    animationSpec = tween(
+        durationMillis = durationMillis,
+        delayMillis = delay,
+    )
+) +  slideOutHorizontally(
+    animationSpec = tween(
+        durationMillis = durationMillis / 2,
+        delayMillis = delay
+    ),
+    targetOffsetX = { -it / 2 }
+)
+
+fun fadeOutWithSlideLeft(
+    durationMillis: Int = 500,
+    delay: Int = 0
+): ExitTransition = fadeOut(
+    animationSpec = tween(
+        durationMillis = durationMillis,
+        delayMillis = delay,
+    )
+) +   slideOutHorizontally(
+    animationSpec = tween(
+        durationMillis = durationMillis / 2,
+        delayMillis = delay
+    ),
+    targetOffsetX = { it / 2 }
+)
