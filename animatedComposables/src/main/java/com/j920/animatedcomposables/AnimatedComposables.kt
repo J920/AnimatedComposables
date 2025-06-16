@@ -1,16 +1,14 @@
 package com.j920.animatedcomposables
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -22,11 +20,13 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -40,108 +40,107 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 
-enum class AnimationDirection {
+enum class AnimationSpec {
+    Fade,
     VerticalDown,
     VerticalUp,
-    HorizontalDown,
-    HorizontalUp
+    HorizontalRight,
+    HorizontalLeft
 }
 
-fun AnimationDirection.getEnterAnimation(
+enum class UiState {
+    Initial,
+    Success,
+    Empty,
+    Error,
+}
+
+fun AnimationSpec.getEnterAnimation(
     durationMillis: Int = 500,
     delay: Int = 0
 ): EnterTransition {
     return when (this) {
-        AnimationDirection.VerticalDown -> {
-            slideInVertically(
-                animationSpec = tween(
-                    durationMillis = durationMillis / 2,
-                    delayMillis = delay
-                ),
-                initialOffsetY = { -it / 2 }
+        AnimationSpec.Fade -> fadeIn(
+            animationSpec = tween(
+                durationMillis = durationMillis,
+                delayMillis = delay,
+            )
+        )
+
+        AnimationSpec.VerticalDown -> {
+            fadeWithSlideDown(
+                durationMillis = durationMillis,
+                delay = delay
             )
         }
 
-        AnimationDirection.VerticalUp -> {
-            slideInVertically(
-                animationSpec = tween(
-                    durationMillis = durationMillis / 2,
-                    delayMillis = delay
-                ),
-                initialOffsetY = { it / 2 }
+        AnimationSpec.VerticalUp -> {
+            fadeWithSlideUp(
+                durationMillis = durationMillis,
+                delay = delay
             )
         }
 
-        AnimationDirection.HorizontalDown -> {
-            slideInHorizontally(
-                animationSpec = tween(
-                    durationMillis = durationMillis / 2,
-                    delayMillis = delay
-                ),
-                initialOffsetX = { -it / 2 }
+        AnimationSpec.HorizontalRight -> {
+            fadeWithSlideRight(
+                durationMillis = durationMillis,
+                delay = delay
             )
         }
 
-        AnimationDirection.HorizontalUp -> {
-            slideInHorizontally(
-                animationSpec = tween(
-                    durationMillis = durationMillis / 2,
-                    delayMillis = delay
-                ),
-                initialOffsetX = { it / 2 }
+        AnimationSpec.HorizontalLeft -> {
+            fadeWithSlideLeft(
+                durationMillis = durationMillis,
+                delay = delay
             )
         }
     }
 }
 
-fun AnimationDirection.getExitAnimation(
+fun AnimationSpec.getExitAnimation(
     durationMillis: Int = 500,
     delay: Int = 0
 ): ExitTransition {
     return when (this) {
-        AnimationDirection.VerticalDown -> {
-            slideOutVertically(
-                animationSpec = tween(
-                    durationMillis = durationMillis / 2,
-                    delayMillis = delay
-                ),
-                targetOffsetY = { -it / 2 }
+        AnimationSpec.Fade -> fadeOut(
+            animationSpec = tween(
+                durationMillis = durationMillis,
+                delayMillis = delay,
+            )
+        )
+
+        AnimationSpec.VerticalDown -> {
+            fadeOutWithSlideDown(
+                durationMillis = durationMillis,
+                delay = delay
             )
         }
 
-        AnimationDirection.VerticalUp -> {
-            slideOutVertically(
-                animationSpec = tween(
-                    durationMillis = durationMillis / 2,
-                    delayMillis = delay
-                ),
-                targetOffsetY = { it / 2 }
+        AnimationSpec.VerticalUp -> {
+            fadeOutWithSlideUp(
+                durationMillis = durationMillis,
+                delay = delay
             )
         }
 
-        AnimationDirection.HorizontalDown -> {
-            slideOutHorizontally(
-                animationSpec = tween(
-                    durationMillis = durationMillis / 2,
-                    delayMillis = delay
-                ),
-                targetOffsetX = { -it / 2 }
+        AnimationSpec.HorizontalRight -> {
+            fadeOutWithSlideRight(
+                durationMillis = durationMillis,
+                delay = delay
             )
         }
 
-        AnimationDirection.HorizontalUp -> {
-            slideOutHorizontally(
-                animationSpec = tween(
-                    durationMillis = durationMillis / 2,
-                    delayMillis = delay
-                ),
-                targetOffsetX = { it / 2 }
+        AnimationSpec.HorizontalLeft -> {
+            fadeOutWithSlideLeft(
+                durationMillis = durationMillis,
+                delay = delay
             )
         }
     }
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimatedScaffold(
     modifier: Modifier = Modifier,
@@ -153,24 +152,28 @@ fun AnimatedScaffold(
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
     contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
-    order: Int = 1,
     orderingDelayInMillis: Int = 0,
     durationMillis: Int = 500,
-    animationDirection: AnimationDirection = AnimationDirection.VerticalUp,
-    enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(
-            animationSpec = tween(
-                durationMillis = durationMillis,
-                delayMillis = delay * order,
-            )
-        ) + animationDirection.getEnterAnimation(durationMillis = durationMillis, delay = delay)
+    animationSpec: AnimationSpec = AnimationSpec.VerticalUp,
+    enterTransition: (delay: Int) -> EnterTransition = { delay ->
+        animationSpec.getEnterAnimation(durationMillis = durationMillis, delay = delay)
     },
-    exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + animationDirection.getExitAnimation(
+    exitTransition: (delay: Int) -> ExitTransition = { delay ->
+        animationSpec.getExitAnimation(
             durationMillis = durationMillis,
             delay = delay
         )
     },
+    switchTransition: () -> ContentTransform = {
+        fadeAnimation()
+    },
+    showFloatingActionButton: Boolean = true,
+    isRefreshing: Boolean = false,
+    uiState: UiState = UiState.Initial,
+    onRefresh: () -> Unit = {},
+    initialContent: @Composable () -> Unit = {},
+    emptyContent: @Composable () -> Unit = {},
+    errorContent: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -178,7 +181,7 @@ fun AnimatedScaffold(
         topBar = topBar,
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,
-        floatingActionButton = { AnimatedFab(true, floatingActionButton) },
+        floatingActionButton = { AnimatedFab(showFloatingActionButton, floatingActionButton) },
         floatingActionButtonPosition = floatingActionButtonPosition,
         containerColor = containerColor,
         contentColor = contentColor,
@@ -186,12 +189,41 @@ fun AnimatedScaffold(
         content = {
             AnimateAlwaysEnter(
                 isSavable = true,
-                enter = enterTransition(order, orderingDelayInMillis),
-                exit = exitTransition(order, orderingDelayInMillis)
+                enter = enterTransition(orderingDelayInMillis),
+                exit = exitTransition(orderingDelayInMillis)
             ) {
-                content(it)
+                PullToRefreshBox(
+                    isRefreshing = isRefreshing,
+                    onRefresh = onRefresh,
+                ) {
+                    AnimatedContent(
+                        targetState = uiState,
+                        transitionSpec = {
+                            switchTransition()
+                        }
+                    ) { state ->
+                        when (state) {
+                            UiState.Initial -> {
+                                initialContent()
+                            }
+
+                            UiState.Success -> {
+                                content(it)
+                            }
+
+                            UiState.Error -> {
+                                errorContent()
+                            }
+
+                            UiState.Empty -> {
+                                emptyContent()
+                            }
+                        }
+                    }
+                }
+
             }
-        },
+        }
     )
 }
 
@@ -200,20 +232,14 @@ fun AnimatedScaffold(
 private fun AnimatedFab(
     showButton: Boolean,
     floatingActionButton: @Composable () -> Unit = {},
-    order: Int = 1,
     orderingDelayInMillis: Int = 0,
     durationMillis: Int = 500,
-    animationDirection: AnimationDirection = AnimationDirection.VerticalUp,
-    enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(
-            animationSpec = tween(
-                durationMillis = durationMillis,
-                delayMillis = delay * order,
-            )
-        ) + animationDirection.getEnterAnimation(durationMillis = durationMillis, delay = delay)
+    animationSpec: AnimationSpec = AnimationSpec.VerticalUp,
+    enterTransition: (delay: Int) -> EnterTransition = { delay ->
+        animationSpec.getEnterAnimation(durationMillis = durationMillis, delay = delay)
     },
-    exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + animationDirection.getExitAnimation(
+    exitTransition: (delay: Int) -> ExitTransition = { delay ->
+        animationSpec.getExitAnimation(
             durationMillis = durationMillis,
             delay = delay
         )
@@ -222,8 +248,8 @@ private fun AnimatedFab(
     AnimateAlwaysEnter(
         isSavable = true,
         condition = showButton,
-        enter = enterTransition(order, orderingDelayInMillis),
-        exit = exitTransition(order, orderingDelayInMillis)
+        enter = enterTransition(orderingDelayInMillis),
+        exit = exitTransition(orderingDelayInMillis)
     ) {
         floatingActionButton()
     }
@@ -237,17 +263,12 @@ fun AnimatedColumn(
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     durationMillis: Int = 500,
-    animationDirection: AnimationDirection = AnimationDirection.VerticalUp,
-    enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(
-            animationSpec = tween(
-                durationMillis = durationMillis,
-                delayMillis = delay * order,
-            )
-        ) + animationDirection.getEnterAnimation(durationMillis = durationMillis, delay = delay)
+    animationSpec: AnimationSpec = AnimationSpec.VerticalUp,
+    enterTransition: (delay: Int) -> EnterTransition = { delay ->
+        animationSpec.getEnterAnimation(durationMillis = durationMillis, delay = delay)
     },
-    exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + animationDirection.getExitAnimation(
+    exitTransition: (delay: Int) -> ExitTransition = { delay ->
+        animationSpec.getExitAnimation(
             durationMillis = durationMillis,
             delay = delay
         )
@@ -256,8 +277,8 @@ fun AnimatedColumn(
 ) {
     AnimateAlwaysEnter(
         isSavable = true,
-        enter = enterTransition(order, orderingDelayInMillis),
-        exit = exitTransition(order, orderingDelayInMillis)
+        enter = enterTransition(orderingDelayInMillis),
+        exit = exitTransition(orderingDelayInMillis)
     ) {
         Column(
             modifier = modifier,
@@ -273,17 +294,12 @@ fun AnimatedRow(
     order: Int = 1,
     orderingDelayInMillis: Int = 0,
     durationMillis: Int = 500,
-    animationDirection: AnimationDirection = AnimationDirection.VerticalDown,
-    enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(
-            animationSpec = tween(
-                durationMillis = durationMillis,
-                delayMillis = delay * order,
-            )
-        ) + animationDirection.getEnterAnimation(durationMillis = durationMillis, delay = delay)
+    animationSpec: AnimationSpec = AnimationSpec.VerticalDown,
+    enterTransition: (delay: Int) -> EnterTransition = { delay ->
+        animationSpec.getEnterAnimation(durationMillis = durationMillis, delay = delay)
     },
-    exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + animationDirection.getExitAnimation(
+    exitTransition: (delay: Int) -> ExitTransition = { delay ->
+        animationSpec.getExitAnimation(
             durationMillis = durationMillis,
             delay = delay
         )
@@ -295,8 +311,8 @@ fun AnimatedRow(
 ) {
     AnimateAlwaysEnter(
         isSavable = false,
-        enter = enterTransition(order, orderingDelayInMillis),
-        exit = exitTransition(order, orderingDelayInMillis)
+        enter = enterTransition(orderingDelayInMillis),
+        exit = exitTransition(orderingDelayInMillis)
     ) {
         Row(
             modifier = modifier,
@@ -313,17 +329,12 @@ fun AnimatedBox(
     order: Int = 1,
     orderingDelayInMillis: Int = 0,
     durationMillis: Int = 500,
-    animationDirection: AnimationDirection = AnimationDirection.VerticalUp,
-    enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(
-            animationSpec = tween(
-                durationMillis = durationMillis,
-                delayMillis = delay * order,
-            )
-        ) + animationDirection.getEnterAnimation(durationMillis = durationMillis, delay = delay)
+    animationSpec: AnimationSpec = AnimationSpec.VerticalUp,
+    enterTransition: (delay: Int) -> EnterTransition = { delay ->
+        animationSpec.getEnterAnimation(durationMillis = durationMillis, delay = delay)
     },
-    exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + animationDirection.getExitAnimation(
+    exitTransition: (delay: Int) -> ExitTransition = { delay ->
+        animationSpec.getExitAnimation(
             durationMillis = durationMillis,
             delay = delay
         )
@@ -334,8 +345,8 @@ fun AnimatedBox(
 ) {
     AnimateAlwaysEnter(
         isSavable = true,
-        enter = enterTransition(order, orderingDelayInMillis),
-        exit = exitTransition(order, orderingDelayInMillis)
+        enter = enterTransition(orderingDelayInMillis),
+        exit = exitTransition(orderingDelayInMillis)
     ) {
         Box(
             modifier = modifier,
@@ -354,17 +365,12 @@ fun LazyListScope.AnimatedItem(
     order: Int = 1,
     orderingDelayInMillis: Int = 0,
     durationMillis: Int = 500,
-    animationDirection: AnimationDirection = AnimationDirection.VerticalUp,
+    animationSpec: AnimationSpec = AnimationSpec.VerticalUp,
     enterTransition: (order: Int, delay: Int) -> EnterTransition = { order, delay ->
-        fadeIn(
-            animationSpec = tween(
-                durationMillis = durationMillis,
-                delayMillis = delay * order,
-            )
-        ) + animationDirection.getEnterAnimation(durationMillis = durationMillis, delay = delay)
+        animationSpec.getEnterAnimation(durationMillis = durationMillis, delay = delay)
     },
     exitTransition: (order: Int, delay: Int) -> ExitTransition = { order, delay ->
-        fadeOut(animationSpec = tween(delayMillis = delay * order)) + animationDirection.getExitAnimation(
+        animationSpec.getExitAnimation(
             durationMillis = durationMillis,
             delay = delay
         )
