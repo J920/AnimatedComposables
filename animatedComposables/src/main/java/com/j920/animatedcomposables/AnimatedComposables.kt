@@ -171,6 +171,14 @@ fun AnimatedScaffold(
     isRefreshing: Boolean = false,
     uiState: UiState = UiState.Initial,
     onRefresh: () -> Unit = {},
+     pullRefreshState: PullToRefreshState = rememberPullToRefreshState(),
+     pullRefreshIndicator: @Composable BoxScope.() -> Unit = {
+        Indicator(
+            modifier = Modifier.align(Alignment.TopCenter),
+            isRefreshing = isRefreshing,
+            state = state
+        )
+    },
     initialContent: @Composable () -> Unit = {},
     emptyContent: @Composable () -> Unit = {},
     errorContent: @Composable () -> Unit = {},
@@ -186,15 +194,20 @@ fun AnimatedScaffold(
         containerColor = containerColor,
         contentColor = contentColor,
         contentWindowInsets = contentWindowInsets,
-        content = {
+        content = { padding ->
             AnimateAlwaysEnter(
+                 modifier = Modifier
+                .padding(padding)
+                .fillMaxSize(),
                 isSavable = true,
                 enter = enterTransition(orderingDelayInMillis),
                 exit = exitTransition(orderingDelayInMillis)
             ) {
                 PullToRefreshBox(
+                     state = pullRefreshState,
                     isRefreshing = isRefreshing,
                     onRefresh = onRefresh,
+                    indicator = pullRefreshIndicator,
                 ) {
                     AnimatedContent(
                         targetState = uiState,
