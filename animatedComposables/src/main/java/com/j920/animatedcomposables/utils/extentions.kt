@@ -1,4 +1,4 @@
-package com.j920.animatedcomposables
+package com.j920.animatedcomposables.utils
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
@@ -29,6 +29,92 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.j920.animatedcomposables.models.AnimationSpec
+
+
+fun AnimationSpec.getEnterAnimation(
+    durationMillis: Int = 500,
+    delay: Int = 0
+): EnterTransition {
+    return when (this) {
+        AnimationSpec.Fade -> fadeIn(
+            animationSpec = tween(
+                durationMillis = durationMillis,
+                delayMillis = delay,
+            )
+        )
+
+        AnimationSpec.VerticalDown -> {
+            fadeWithSlideDown(
+                durationMillis = durationMillis,
+                delay = delay
+            )
+        }
+
+        AnimationSpec.VerticalUp -> {
+            fadeWithSlideUp(
+                durationMillis = durationMillis,
+                delay = delay
+            )
+        }
+
+        AnimationSpec.HorizontalRight -> {
+            fadeWithSlideRight(
+                durationMillis = durationMillis,
+                delay = delay
+            )
+        }
+
+        AnimationSpec.HorizontalLeft -> {
+            fadeWithSlideLeft(
+                durationMillis = durationMillis,
+                delay = delay
+            )
+        }
+    }
+}
+
+fun AnimationSpec.getExitAnimation(
+    durationMillis: Int = 500,
+    delay: Int = 0
+): ExitTransition {
+    return when (this) {
+        AnimationSpec.Fade -> fadeOut(
+            animationSpec = tween(
+                durationMillis = durationMillis,
+                delayMillis = delay,
+            )
+        )
+
+        AnimationSpec.VerticalDown -> {
+            fadeOutWithSlideDown(
+                durationMillis = durationMillis,
+                delay = delay
+            )
+        }
+
+        AnimationSpec.VerticalUp -> {
+            fadeOutWithSlideUp(
+                durationMillis = durationMillis,
+                delay = delay
+            )
+        }
+
+        AnimationSpec.HorizontalRight -> {
+            fadeOutWithSlideRight(
+                durationMillis = durationMillis,
+                delay = delay
+            )
+        }
+
+        AnimationSpec.HorizontalLeft -> {
+            fadeOutWithSlideLeft(
+                durationMillis = durationMillis,
+                delay = delay
+            )
+        }
+    }
+}
 
 
 fun defaultAnimation(): ContentTransform {
