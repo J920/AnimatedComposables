@@ -5,7 +5,8 @@ plugins {
 }
 
 android {
-    namespace = "com.j920.animatedcomposables"
+    namespace = "com.j920.animatedcomposables.componants"
+    namespace = "com.j920.animatedcomposables.models"
     compileSdk = 36
 
     defaultConfig {
