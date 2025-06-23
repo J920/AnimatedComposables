@@ -31,7 +31,7 @@ import com.j920.animatedcomposables.utils.getExitAnimation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <S> AnimatedContent(
+fun <S> AnimatedScaffold(
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
