@@ -31,7 +31,7 @@ import com.j920.animatedcomposables.utils.getExitAnimation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T> AnimatedScaffold(
+fun <S> AnimatedContent(
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
@@ -58,7 +58,7 @@ fun <T> AnimatedScaffold(
     },
     showFloatingActionButton: Boolean = true,
     isRefreshing: Boolean = false,
-    uiState: UiState<T> = UiState.Initial,
+    uiState: UiState<S> = UiState.Initial,
     onRefresh: () -> Unit = {},
     pullRefreshState: PullToRefreshState = rememberPullToRefreshState(),
     pullRefreshIndicator: @Composable BoxScope.() -> Unit = {
@@ -72,7 +72,7 @@ fun <T> AnimatedScaffold(
     emptyContent: @Composable () -> Unit = {},
     loadingContent: @Composable () -> Unit = {},
     errorContent: @Composable (UiState.Error) -> Unit = {},
-    content: @Composable (PaddingValues, UiState.Success<T>) -> Unit
+    content: @Composable (PaddingValues, UiState.Success<S>) -> Unit
 ) {
     Scaffold(
         modifier = modifier,

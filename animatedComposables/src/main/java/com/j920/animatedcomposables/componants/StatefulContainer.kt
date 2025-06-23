@@ -8,17 +8,17 @@ import com.j920.animatedcomposables.utils.fadeAnimation
 import com.j920.animatedcomposables.models.UiState
 
 @Composable
-fun <T> StatefulContainer(
+fun <S> StatefulContainer(
     modifier: Modifier = Modifier,
     switchTransition: () -> ContentTransform = {
         fadeAnimation()
     },
-    uiState: UiState<T> = UiState.Initial,
+    uiState: UiState<S> = UiState.Initial,
     initialContent: @Composable () -> Unit = {},
     loadingContent: @Composable () -> Unit = {},
     errorContent: @Composable (UiState.Error) -> Unit = {},
     emptyContent: @Composable () -> Unit = {},
-    content: @Composable (UiState.Success<T>) -> Unit
+    content: @Composable (UiState.Success<S>) -> Unit
 ) {
     AnimatedContent(
         modifier = modifier,
