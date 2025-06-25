@@ -24,11 +24,15 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import com.j920.animatedcomposables.models.AnimationSpec
 
 
@@ -339,3 +343,24 @@ fun fadeOutWithSlideLeft(
     ),
     targetOffsetX = { it / 2 }
 )
+
+
+fun LazyListScope.pagingLoadStateItem(
+    loadState: LoadState,
+    keySuffix: String? = null,
+    loading: (@Composable LazyItemScope.() -> Unit)? = null,
+    error: (@Composable LazyItemScope.(LoadState.Error) -> Unit)? = null,
+) {
+    if (loading != null && loadState == LoadState.Loading) {
+        item(
+            key = keySuffix?.let { "loadingItem_$it" },
+            content = loading,
+        )
+    }
+    if (error != null && loadState is LoadState.Error) {
+        item(
+            key = keySuffix?.let { "errorItem_$it" },
+            content = { error(loadState)},
+        )
+    }
+}
